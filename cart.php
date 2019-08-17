@@ -13,16 +13,43 @@
 
 
     if(isset($_POST['remove'])){
-        // print_r($_GET['id']);
-        // 1:19:55
         if($_GET['action'] == 'remove'){
             foreach ($_SESSION['cart'] as $key => $value) {
                 if($value["product_id"] == $_GET['id']){
-                    // 1:20:51
-                    unset($_SESSION['cart'][$key]); 
+                    // unset($_SESSION['cart'][$key]); 
+                    array_splice($_SESSION['cart'], $key,1); 
                     echo "<script>alert('Product has been Removed ...')</script>";
                     echo "<script>window.location='cart.php'</script>";
                     
+                }
+            }
+        }
+    }
+    if(isset($_POST['plus'])){
+
+            for ($i=0; $i < count($_SESSION['cart']); $i++) { 
+                
+                                if($_SESSION['cart'][$i]["product_id"] == $_GET['id']){
+                              
+                                    $quantity = $_POST['quantity'] + 1; 
+                                    $_SESSION['cart'][$i]['quantity'] = $quantity; 
+                                }
+                }
+    }
+    if(isset($_POST['minus'])){
+
+        for ($i=0; $i < count($_SESSION['cart']); $i++) { 
+            if($_SESSION['cart'][$i]["product_id"] == $_GET['id']){
+
+                $quantity = $_POST['quantity'] - 1; 
+                if ($quantity > 0 ) {
+                   
+                    $_SESSION['cart'][$i]['quantity'] = $quantity; 
+                } else {
+                    array_splice($_SESSION['cart'], $i,1); 
+                    echo "<script>alert('Product has been Removed ...')</script>";
+                    echo "<script>window.location='cart.php'</script>";
+
                 }
             }
         }
@@ -44,6 +71,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- CSS file -->
     <link rel="stylesheet" type="text/css" href="style.css">
+    
 </head>
 <body class="bg-light">
 
@@ -69,14 +97,10 @@ $total = 0;
 
 
 if(isset($_SESSION['cart'])){
-
     $product_id = array_column($_SESSION['cart'], 'product_id'); 
-
     $items = new Items($pdo); 
 
-    $total = $items->getCartItems($product_id, $total); 
-
-
+            $total = $items->getCartItems($product_id, $total, $_SESSION['cart']); 
     
 }else{
     
@@ -113,15 +137,11 @@ if(isset($_SESSION['cart'])){
                     <h6>Amount Payable</h6>
                 </div>
                 <div class="col-md-6">
-                    <h6>&euro; <?php echo $total; ?> </h6>
+                    <h6 class="test-php">&euro; <?php echo $total; ?> </h6>
+
                     <h6 class="text-success">Free</h6>
                     <hr/>
-                    <h6>
-                        &euro; 
-                        <?php 
-                            echo $total; 
-                        ?> 
-                    </h6>
+                    <h6>&euro;  <?php echo $total; ?></h6>
                 </div>
             </div>
         </div>

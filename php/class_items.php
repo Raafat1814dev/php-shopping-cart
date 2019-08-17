@@ -35,13 +35,10 @@ class Items
         }
         
         $pdo = $this->pdo->closeConnection(); 
-        // while($row = $pdo->exec($sql)) {
-            // component($row['product_name'], $row['product_price'],$row['product_image'], $row['id']); 
-        //  }
 
     }
     // get product from the database 
-    public function getCartItems($product_id, $total){
+    public function getCartItems($product_id, $total, $quantity){
      
         $pdo = $this->pdo->openConnection();      
         
@@ -51,9 +48,21 @@ class Items
         foreach ($pdo->query($sql) as $row) {
             foreach($product_id as $id ){
                 if($row['id'] == $id){
-                cartElement($row['product_image'], $row['product_name'],$row['product_price'], $row['id']); 
+                    foreach ($quantity as $key => $value) {
+                       
+                        if($row['id'] == $value['product_id'] ){
+                            if(!isset($value['quantity'])){
+                                cartElement($row['product_image'], $row['product_name'],$row['product_price'], $row['id'], 1); 
+                                $total = $total + ((int)$row['product_price'] * 1);
+                            }else{
 
-                $total = $total + (int)$row['product_price']; 
+                                cartElement($row['product_image'], $row['product_name'],$row['product_price'], $row['id'], $value['quantity']); 
+                                $total = $total + ((int)$row['product_price'] * $value['quantity']); 
+                            }
+                        }
+                    }
+
+                // $total = $total + (int)$row['product_price']; 
                 }
                 
             }
